@@ -78,24 +78,56 @@ class EST_State(Enum):
 
 class USER_ErrorCode(Enum):
     USER_ErrorCode_NoError = 0  # no error error code
-    USER_ErrorCode_iqFullScaleCurrent_A_High = 1  # iqFullScaleCurrent_A too high error code
-    USER_ErrorCode_iqFullScaleCurrent_A_Low = 2  # iqFullScaleCurrent_A too low error code
-    USER_ErrorCode_iqFullScaleVoltage_V_High = 3  # iqFullScaleVoltage_V too high error code
-    USER_ErrorCode_iqFullScaleVoltage_V_Low = 4  # iqFullScaleVoltage_V too low error code
+    USER_ErrorCode_iqFullScaleCurrent_A_High = (
+        1  # iqFullScaleCurrent_A too high error code
+    )
+    USER_ErrorCode_iqFullScaleCurrent_A_Low = (
+        2  # iqFullScaleCurrent_A too low error code
+    )
+    USER_ErrorCode_iqFullScaleVoltage_V_High = (
+        3  # iqFullScaleVoltage_V too high error code
+    )
+    USER_ErrorCode_iqFullScaleVoltage_V_Low = (
+        4  # iqFullScaleVoltage_V too low error code
+    )
     USER_ErrorCode_iqFullScaleFreq_Hz_High = 5  # iqFullScaleFreq_Hz too high error code
     USER_ErrorCode_iqFullScaleFreq_Hz_Low = 6  # iqFullScaleFreq_Hz too low error code
-    USER_ErrorCode_numPwmTicksPerIsrTick_High = 7  # numPwmTicksPerIsrTick too high error code
-    USER_ErrorCode_numPwmTicksPerIsrTick_Low = 8  # numPwmTicksPerIsrTick too low error code
-    USER_ErrorCode_numIsrTicksPerCtrlTick_High = 9  # numIsrTicksPerCtrlTick too high error code
-    USER_ErrorCode_numIsrTicksPerCtrlTick_Low = 10  # numIsrTicksPerCtrlTick too low error code
-    USER_ErrorCode_numCtrlTicksPerCurrentTick_High = 11  # numCtrlTicksPerCurrentTick too high error code
-    USER_ErrorCode_numCtrlTicksPerCurrentTick_Low = 12  # numCtrlTicksPerCurrentTick too low error code
-    USER_ErrorCode_numCtrlTicksPerEstTick_High = 13  # numCtrlTicksPerEstTick too high error code
-    USER_ErrorCode_numCtrlTicksPerEstTick_Low = 14  # numCtrlTicksPerEstTick too low error code
-    USER_ErrorCode_numCtrlTicksPerSpeedTick_High = 15  # numCtrlTicksPerSpeedTick too high error code
-    USER_ErrorCode_numCtrlTicksPerSpeedTick_Low = 16  # numCtrlTicksPerSpeedTick too low error code
-    USER_ErrorCode_numCtrlTicksPerTrajTick_High = 17  # numCtrlTicksPerTrajTick too high error code
-    USER_ErrorCode_numCtrlTicksPerTrajTick_Low = 18  # numCtrlTicksPerTrajTick too low error code
+    USER_ErrorCode_numPwmTicksPerIsrTick_High = (
+        7  # numPwmTicksPerIsrTick too high error code
+    )
+    USER_ErrorCode_numPwmTicksPerIsrTick_Low = (
+        8  # numPwmTicksPerIsrTick too low error code
+    )
+    USER_ErrorCode_numIsrTicksPerCtrlTick_High = (
+        9  # numIsrTicksPerCtrlTick too high error code
+    )
+    USER_ErrorCode_numIsrTicksPerCtrlTick_Low = (
+        10  # numIsrTicksPerCtrlTick too low error code
+    )
+    USER_ErrorCode_numCtrlTicksPerCurrentTick_High = (
+        11  # numCtrlTicksPerCurrentTick too high error code
+    )
+    USER_ErrorCode_numCtrlTicksPerCurrentTick_Low = (
+        12  # numCtrlTicksPerCurrentTick too low error code
+    )
+    USER_ErrorCode_numCtrlTicksPerEstTick_High = (
+        13  # numCtrlTicksPerEstTick too high error code
+    )
+    USER_ErrorCode_numCtrlTicksPerEstTick_Low = (
+        14  # numCtrlTicksPerEstTick too low error code
+    )
+    USER_ErrorCode_numCtrlTicksPerSpeedTick_High = (
+        15  # numCtrlTicksPerSpeedTick too high error code
+    )
+    USER_ErrorCode_numCtrlTicksPerSpeedTick_Low = (
+        16  # numCtrlTicksPerSpeedTick too low error code
+    )
+    USER_ErrorCode_numCtrlTicksPerTrajTick_High = (
+        17  # numCtrlTicksPerTrajTick too high error code
+    )
+    USER_ErrorCode_numCtrlTicksPerTrajTick_Low = (
+        18  # numCtrlTicksPerTrajTick too low error code
+    )
     USER_ErrorCode_numCurrentSensors_High = 19  # numCurrentSensors too high error code
     USER_ErrorCode_numCurrentSensors_Low = 20  # numCurrentSensors too low error code
     USER_ErrorCode_numVoltageSensors_High = 21  # numVoltageSensors too high error code
@@ -120,8 +152,12 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_dcBusPole_rps_Low = 40  # dcBusPole_rps too low error code
     USER_ErrorCode_fluxFraction_High = 41  # fluxFraction too high error code
     USER_ErrorCode_fluxFraction_Low = 42  # fluxFraction too low error code
-    USER_ErrorCode_indEst_speedMaxFraction_High = 43  # indEst_speedMaxFraction too high error code
-    USER_ErrorCode_indEst_speedMaxFraction_Low = 44  # indEst_speedMaxFraction too low error code
+    USER_ErrorCode_indEst_speedMaxFraction_High = (
+        43  # indEst_speedMaxFraction too high error code
+    )
+    USER_ErrorCode_indEst_speedMaxFraction_Low = (
+        44  # indEst_speedMaxFraction too low error code
+    )
     USER_ErrorCode_powerWarpGain_High = 45  # powerWarpGain too high error code
     USER_ErrorCode_powerWarpGain_Low = 46  # powerWarpGain too low error code
     USER_ErrorCode_systemFreq_MHz_High = 47  # systemFreq_MHz too high error code
@@ -132,14 +168,20 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_voltage_sf_Low = 52  # voltage_sf too low error code
     USER_ErrorCode_current_sf_High = 53  # current_sf too high error code
     USER_ErrorCode_current_sf_Low = 54  # current_sf too low error code
-    USER_ErrorCode_voltageFilterPole_Hz_High = 55  # voltageFilterPole_Hz too high error code
-    USER_ErrorCode_voltageFilterPole_Hz_Low = 56  # voltageFilterPole_Hz too low error code
+    USER_ErrorCode_voltageFilterPole_Hz_High = (
+        55  # voltageFilterPole_Hz too high error code
+    )
+    USER_ErrorCode_voltageFilterPole_Hz_Low = (
+        56  # voltageFilterPole_Hz too low error code
+    )
     USER_ErrorCode_maxVsMag_pu_High = 57  # maxVsMag_pu too high error code
     USER_ErrorCode_maxVsMag_pu_Low = 58  # maxVsMag_pu too low error code
     USER_ErrorCode_estKappa_High = 59  # estKappa too high error code
     USER_ErrorCode_estKappa_Low = 60  # estKappa too low error code
     USER_ErrorCode_motor_type_Unknown = 61  # motor type unknown error code
-    USER_ErrorCode_motor_numPolePairs_High = 62  # motor_numPolePairs too high error code
+    USER_ErrorCode_motor_numPolePairs_High = (
+        62  # motor_numPolePairs too high error code
+    )
     USER_ErrorCode_motor_numPolePairs_Low = 63  # motor_numPolePairs too low error code
     USER_ErrorCode_motor_ratedFlux_High = 64  # motor_ratedFlux too high error code
     USER_ErrorCode_motor_ratedFlux_Low = 65  # motor_ratedFlux too low error code
@@ -159,14 +201,26 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_maxCurrent_indEst_Low = 79  # maxCurrent_indEst too low error code
     USER_ErrorCode_maxCurrentSlope_High = 80  # maxCurrentSlope too high error code
     USER_ErrorCode_maxCurrentSlope_Low = 81  # maxCurrentSlope too low error code
-    USER_ErrorCode_maxCurrentSlope_powerWarp_High = 82  # maxCurrentSlope_powerWarp too high error code
-    USER_ErrorCode_maxCurrentSlope_powerWarp_Low = 83  # maxCurrentSlope_powerWarp too low error code
+    USER_ErrorCode_maxCurrentSlope_powerWarp_High = (
+        82  # maxCurrentSlope_powerWarp too high error code
+    )
+    USER_ErrorCode_maxCurrentSlope_powerWarp_Low = (
+        83  # maxCurrentSlope_powerWarp too low error code
+    )
     USER_ErrorCode_IdRated_High = 84  # IdRated too high error code
     USER_ErrorCode_IdRated_Low = 85  # IdRated too low error code
-    USER_ErrorCode_IdRatedFraction_indEst_High = 86  # IdRatedFraction_indEst too high error code
-    USER_ErrorCode_IdRatedFraction_indEst_Low = 87  # IdRatedFraction_indEst too low error code
-    USER_ErrorCode_IdRatedFraction_ratedFlux_High = 88  # IdRatedFraction_ratedFlux too high error code
-    USER_ErrorCode_IdRatedFraction_ratedFlux_Low = 89  # IdRatedFraction_ratedFlux too low error code
+    USER_ErrorCode_IdRatedFraction_indEst_High = (
+        86  # IdRatedFraction_indEst too high error code
+    )
+    USER_ErrorCode_IdRatedFraction_indEst_Low = (
+        87  # IdRatedFraction_indEst too low error code
+    )
+    USER_ErrorCode_IdRatedFraction_ratedFlux_High = (
+        88  # IdRatedFraction_ratedFlux too high error code
+    )
+    USER_ErrorCode_IdRatedFraction_ratedFlux_Low = (
+        89  # IdRatedFraction_ratedFlux too low error code
+    )
     USER_ErrorCode_IdRated_delta_High = 90  # IdRated_delta too high error code
     USER_ErrorCode_IdRated_delta_Low = 91  # IdRated_delta too low error code
     USER_ErrorCode_fluxEstFreq_Hz_High = 92  # fluxEstFreq_Hz too high error code
@@ -181,8 +235,12 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_trajFreq_Hz_Low = 101  # trajFreq_Hz too low error code
     USER_ErrorCode_ctrlPeriod_sec_High = 102  # ctrlPeriod_sec too high error code
     USER_ErrorCode_ctrlPeriod_sec_Low = 103  # ctrlPeriod_sec too low error code
-    USER_ErrorCode_maxNegativeIdCurrent_a_High = 104  # maxNegativeIdCurrent_a too high error code
-    USER_ErrorCode_maxNegativeIdCurrent_a_Low = 105  # maxNegativeIdCurrent_a too low error code
+    USER_ErrorCode_maxNegativeIdCurrent_a_High = (
+        104  # maxNegativeIdCurrent_a too high error code
+    )
+    USER_ErrorCode_maxNegativeIdCurrent_a_Low = (
+        105  # maxNegativeIdCurrent_a too low error code
+    )
     USER_numErrorCodes = 106  # the number of user error codes
 
 
@@ -212,7 +270,9 @@ class Manta50Panel(QDialog):
     def __init__(self, parent, node):
         super(Manta50Panel, self).__init__(parent)
         self.setWindowTitle("Manta ESC Panel")
-        self.setAttribute(Qt.WA_DeleteOnClose)  # This is required to stop background timers!
+        self.setAttribute(
+            Qt.WA_DeleteOnClose
+        )  # This is required to stop background timers!
 
         self.param_index = {
             "Node ID": (0, int),
@@ -244,8 +304,16 @@ class Manta50Panel(QDialog):
         self.current_index = 0
         self.messages = {}
 
-        self.integer_params_key = [key for key, (index, param_type) in self.param_index.items() if param_type is int]
-        self.integer_params_index = [index for key, (index, param_type) in self.param_index.items() if param_type is int]
+        self.integer_params_key = [
+            key
+            for key, (index, param_type) in self.param_index.items()
+            if param_type is int
+        ]
+        self.integer_params_index = [
+            index
+            for key, (index, param_type) in self.param_index.items()
+            if param_type is int
+        ]
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -267,17 +335,45 @@ class Manta50Panel(QDialog):
         layout.addLayout(fetch)
         layout.addWidget(self.table)
 
-        # Log message display
-        self.log_display = QPlainTextEdit()
-        self.log_display.setReadOnly(True)
-        self.log_display.setFont(get_monospace_font())
-        self.log_display.setLineWrapMode(QPlainTextEdit.NoWrap)
-        self.log_display.setWordWrapMode(QTextOption.NoWrap)
-        self.log_display.setUndoRedoEnabled(False)
-        self.log_display.setContextMenuPolicy(Qt.NoContextMenu)
-        self.log_display.setTabStopWidth(20)
-        self.log_display.setPlaceholderText("Log messages")
-        layout.addWidget(self.log_display)
+        # CtrlState message display
+        self.CtrlState_display = QPlainTextEdit()
+        self.CtrlState_display.setReadOnly(True)
+        self.CtrlState_display.setFont(get_monospace_font())
+        self.CtrlState_display.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.CtrlState_display.setWordWrapMode(QTextOption.NoWrap)
+        self.CtrlState_display.setUndoRedoEnabled(False)
+        self.CtrlState_display.setContextMenuPolicy(Qt.NoContextMenu)
+        self.CtrlState_display.setTabStopWidth(20)
+        self.CtrlState_display.setPlaceholderText("CtrlState messages")
+
+        # EstState message display
+        self.EstState_display = QPlainTextEdit()
+        self.EstState_display.setReadOnly(True)
+        self.EstState_display.setFont(get_monospace_font())
+        self.EstState_display.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.EstState_display.setWordWrapMode(QTextOption.NoWrap)
+        self.EstState_display.setUndoRedoEnabled(False)
+        self.EstState_display.setContextMenuPolicy(Qt.NoContextMenu)
+        self.EstState_display.setTabStopWidth(20)
+        self.EstState_display.setPlaceholderText("EstState messages")
+
+        # UserErrorCode message display
+        self.UserErrorCode_display = QPlainTextEdit()
+        self.UserErrorCode_display.setReadOnly(True)
+        self.UserErrorCode_display.setFont(get_monospace_font())
+        self.UserErrorCode_display.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.UserErrorCode_display.setWordWrapMode(QTextOption.NoWrap)
+        self.UserErrorCode_display.setUndoRedoEnabled(False)
+        self.UserErrorCode_display.setContextMenuPolicy(Qt.NoContextMenu)
+        self.UserErrorCode_display.setTabStopWidth(20)
+        self.UserErrorCode_display.setPlaceholderText("UserErrorCode messages")
+
+        message_layout = QHBoxLayout()
+        message_layout.addWidget(self.CtrlState_display)
+        message_layout.addWidget(self.EstState_display)
+        message_layout.addWidget(self.UserErrorCode_display)
+
+        layout.addLayout(message_layout)
 
         # 0
         self.node_id = QSpinBox(self)
@@ -295,7 +391,9 @@ class Manta50Panel(QDialog):
         self.esc_index.setValue(0)
         self.esc_index_set = QPushButton("Set", self)
         self.esc_index_set.clicked.connect(self.on_esc_index_set)
-        layout.addLayout(self.labelWidget("ESC Index:", [self.esc_index, self.esc_index_set]))
+        layout.addLayout(
+            self.labelWidget("ESC Index:", [self.esc_index, self.esc_index_set])
+        )
 
         # 2
         self.arming = QCheckBox(self)
@@ -310,7 +408,9 @@ class Manta50Panel(QDialog):
         self.tele_rate.setCurrentText("25")
         self.tele_rate_set = QPushButton("Set", self)
         self.tele_rate_set.clicked.connect(self.on_tele_rate_set)
-        layout.addLayout(self.labelWidget("Telemetry Rate Hz:", [self.tele_rate, self.tele_rate_set]))
+        layout.addLayout(
+            self.labelWidget("Telemetry Rate Hz:", [self.tele_rate, self.tele_rate_set])
+        )
 
         # 4
         self.baudrate = QComboBox(self)
@@ -319,7 +419,9 @@ class Manta50Panel(QDialog):
         self.baudrate.setCurrentText(list(self.bmap.keys())[1])
         self.baudrate_set = QPushButton("Set", self)
         self.baudrate_set.clicked.connect(self.on_baudrate_set)
-        layout.addLayout(self.labelWidget("CAN Speed:", [self.baudrate, self.baudrate_set]))
+        layout.addLayout(
+            self.labelWidget("CAN Speed:", [self.baudrate, self.baudrate_set])
+        )
         # 5
         self.max_speed = QDoubleSpinBox(self)
         self.max_speed.setMinimum(0.0)
@@ -327,7 +429,11 @@ class Manta50Panel(QDialog):
         self.max_speed.setValue(5.0)
         self.max_speed_set = QPushButton("Set", self)
         self.max_speed_set.clicked.connect(self.on_max_speed_set)
-        layout.addLayout(self.labelWidget("Motor Max Speed KRPM:", [self.max_speed, self.max_speed_set]))
+        layout.addLayout(
+            self.labelWidget(
+                "Motor Max Speed KRPM:", [self.max_speed, self.max_speed_set]
+            )
+        )
         # 6
         self.checkboxes = {
             "enableSys": QCheckBox("Enable System", self),
@@ -350,7 +456,9 @@ class Manta50Panel(QDialog):
         self.midle_point = QCheckBox(self)
         self.midle_point_set = QPushButton("Set", self)
         self.midle_point_set.clicked.connect(self.on_midle_point_set)
-        layout.addLayout(self.labelWidget("Midle Point", [self.midle_point, self.midle_point_set]))
+        layout.addLayout(
+            self.labelWidget("Midle Point", [self.midle_point, self.midle_point_set])
+        )
 
         # 8
         self.acceleration = QDoubleSpinBox(self)
@@ -359,7 +467,11 @@ class Manta50Panel(QDialog):
         self.acceleration.setValue(2.0)
         self.acceleration_set = QPushButton("Set", self)
         self.acceleration_set.clicked.connect(self.on_acceleration_set)
-        layout.addLayout(self.labelWidget("Acceleration KRPM:", [self.acceleration, self.acceleration_set]))
+        layout.addLayout(
+            self.labelWidget(
+                "Acceleration KRPM:", [self.acceleration, self.acceleration_set]
+            )
+        )
 
         # 9
         self.motor_poles = QSpinBox(self)
@@ -368,7 +480,9 @@ class Manta50Panel(QDialog):
         self.motor_poles.setValue(14)
         self.motor_poles_set = QPushButton("Set", self)
         self.motor_poles_set.clicked.connect(self.on_motor_poles_set)
-        layout.addLayout(self.labelWidget("Motor Poles:", [self.motor_poles, self.motor_poles_set]))
+        layout.addLayout(
+            self.labelWidget("Motor Poles:", [self.motor_poles, self.motor_poles_set])
+        )
 
         # 10
         self.kp = QDoubleSpinBox(self)
@@ -394,7 +508,9 @@ class Manta50Panel(QDialog):
         self.resize(1200, 450)
 
         self.handlers = [
-            node.add_handler(dronecan.uavcan.protocol.debug.LogMessage, self.handle_debug_log_message),
+            node.add_handler(
+                dronecan.uavcan.protocol.debug.LogMessage, self.handle_debug_log_message
+            ),
         ]
 
         QTimer.singleShot(767, self.update_nodes)
@@ -410,7 +526,9 @@ class Manta50Panel(QDialog):
 
     def send_next_request(self):
         if self.current_index < len(self.param_index):
-            request = dronecan.uavcan.protocol.param.GetSet.Request(index=self.current_index)
+            request = dronecan.uavcan.protocol.param.GetSet.Request(
+                index=self.current_index
+            )
             self._node.request(request, self.nodeid, self.empty_callback)
             self.current_index += 1
         else:
@@ -462,11 +580,29 @@ class Manta50Panel(QDialog):
         if message.level.value != INFO:
             decoded_message = message.text.decode("utf-8")
             updated_message = replace_enum_values(decoded_message)
-            self.log_display.appendPlainText(updated_message)
+
+            user_error_code_match = re.search(
+                r"(UserErrorCode:)\s*(\d+)", decoded_message
+            )
+            if user_error_code_match:
+                updated_message = replace_enum_values(user_error_code_match.group(0))
+                self.UserErrorCode_display.appendPlainText(updated_message)
+
+            ctrl_state_match = re.search(r"(CtrlState:)\s*(\d+)", decoded_message)
+            if ctrl_state_match:
+                updated_message = replace_enum_values(ctrl_state_match.group(0))
+                self.CtrlState_display.appendPlainText(updated_message)
+
+            est_state_match = re.search(r"(EstState:)\s*(\d+)", decoded_message)
+            if est_state_match:
+                updated_message = replace_enum_values(est_state_match.group(0))
+                self.EstState_display.appendPlainText(updated_message)
 
         if message.level.value == INFO:
             self.set_checkboxes_from_byte(0)
-            self.log_display.clear()
+            self.CtrlState_display.clear()
+            self.EstState_display.clear()
+            self.UserErrorCode_display.clear()
             parts = message.text.decode("utf-8").split(" ")
             if len(parts) >= 2:
                 key, value = parts[0], " ".join(parts[1:])
@@ -576,7 +712,9 @@ class Manta50Panel(QDialog):
             else:
                 node_list.append("%u" % nid)
         node_list = sorted(node_list)
-        current_node = sorted([self.node_select.itemText(i) for i in range(self.node_select.count())])
+        current_node = sorted(
+            [self.node_select.itemText(i) for i in range(self.node_select.count())]
+        )
         for n in node_list:
             if not n in current_node:
                 self.node_select.addItem(n)
