@@ -5,19 +5,6 @@
 #
 # Author: Andrew Buckin
 #
-# Motor ID
-# CtrlState:2
-# CtrlState:3
-# EstState:2
-# EstState:3
-# EstState:4
-# EstState:6
-# EstState:7
-# EstState:10
-# EstState:8
-# CtrlState:1
-# EstState:1
-
 
 import dronecan
 from functools import partial
@@ -330,6 +317,16 @@ class Manta50Panel(QDialog):
             "100KHz->7": 7,
             "80KHz->6": 6,
             "50KHz->5": 5,
+        }
+
+        self.bit_positions = {
+            "enableSys": 0,
+            "runIdentify": 1,
+            "FieldWeakening": 2,
+            "ForceAngle": 3,
+            "RsRecalc": 4,
+            "PowerWarp": 5,
+            "UserParams": 6,
         }
 
         self._node = node
@@ -878,9 +875,37 @@ class Manta50Panel(QDialog):
         control_word = self.get_byte_from_checkboxes()
         QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
 
+    def set_bits_by_names(self, byte, bit_names):
+
+        for bit_name in bit_names:
+            if bit_name in self.bit_positions:
+                bit_position = self.bit_positions[bit_name]
+                byte |= 1 << bit_position  # Set
+            else:
+                raise ValueError(f"No Name: {bit_name}")
+        return byte
+
+    def clear_bits_by_names(self, byte, bit_names):
+
+        for bit_name in bit_names:
+            if bit_name in self.bit_positions:
+                bit_position = self.bit_positions[bit_name]
+                byte &= ~(1 << bit_position)  # Clear
+            else:
+                raise ValueError(f"No Name: {bit_name}")
+        return byte
+
+    def set_reset_control_word(self, flag):
+        com_index = self.param_index["Control Word"][0]
+        self.current_index = com_index + 1
+        control_word = self.get_byte_from_checkboxes()
+        if flag:
+            control_word = self.set_bits_by_names(
+                control_word, ["Reset", "RunIdentify"]
+            )
+        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
+
     def start_motor_id(self):
-        # self.MotorRrogressCtrl = []
-        # self.MotorRrogressEst = []
         self.CtrlState_display.clear()
         self.EstState_display.clear()
         self.Motor_ID_list = []
@@ -888,13 +913,18 @@ class Manta50Panel(QDialog):
         self.MotorOK = False
         self.progressValue = 0
         self.progressBar.setValue(self.progressValue)
-        # if self.progressValue >= 11:
-        #     self.progressValue = 0
-        #     self.progressBar.setValue(0)
-        #     self.MotorID = False
-        # else:
-        #     self.progressValue += 1
-        #     self.progressBar.setValue(self.progressValue)
+        self.nodeid = int(self.node_select.currentText().split(":")[0])
+        com_index = self.param_index["Control Word"][0]
+        self.current_index = com_index + 1
+        control_word = self.get_byte_from_checkboxes()
+        print(control_word)
+        control_word = self.clear_bits_by_names(
+            control_word, ["UserParams"] # "runIdentify"
+        )
+        # print(control_word)
+        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
+        control_word = self.set_bits_by_names(control_word, ["runIdentify"])
+        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
 
     def updateProgressBarStyle(self, value):
 
