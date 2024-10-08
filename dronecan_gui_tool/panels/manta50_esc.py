@@ -5,6 +5,19 @@
 #
 # Author: Andrew Buckin
 #
+# Motor ID
+# CtrlState:2
+# CtrlState:3
+# EstState:2
+# EstState:3
+# EstState:4
+# EstState:6
+# EstState:7
+# EstState:10
+# EstState:8
+# CtrlState:1
+# EstState:1
+
 
 import dronecan
 from functools import partial
@@ -26,6 +39,7 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QHeaderView,
     QCheckBox,
+    QProgressBar,
 )
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QTextOption
@@ -274,6 +288,25 @@ class Manta50Panel(QDialog):
             Qt.WA_DeleteOnClose
         )  # This is required to stop background timers!
 
+        # self.MotorRrogressCtrl = []
+        # self.MotorRrogressEst = []
+        self.Motor_ID_list = []
+        self.MotorID = False
+        self.MotorOK = False
+        self.Motor_ID_pattern = [
+            "CtrlState:2",
+            "CtrlState:3",
+            "EstState:2",
+            "EstState:3",
+            "EstState:4",
+            "EstState:6",
+            "EstState:7",
+            "EstState:10",
+            "EstState:8",
+            "CtrlState:1",
+            "EstState:1",
+        ]
+
         self.param_index = {
             "Node ID": (0, int),
             "ESC Index": (1, int),
@@ -504,6 +537,21 @@ class Manta50Panel(QDialog):
         self.ki_set.clicked.connect(self.on_ki_set)
         layout.addLayout(self.labelWidget("KI:", [self.ki, self.ki_set]))
 
+        # индикатор процесса
+        self.progressValue = 0
+        self.progressBar = QProgressBar(self)
+        self.progressBar.setRange(0, 11)
+        self.startButton = QPushButton("Start Motor ID", self)
+        self.startButton.clicked.connect(self.start_motor_id)
+
+        # self.progressTimer = QTimer(self)
+        # self.progressTimer.timeout.connect(self.updateProgress)
+
+        layoutProgress = QHBoxLayout()
+        layoutProgress.addWidget(self.progressBar)
+        layoutProgress.addWidget(self.startButton)
+        layout.addLayout(layoutProgress)
+
         self.setLayout(layout)
         self.resize(1200, 450)
 
@@ -590,13 +638,28 @@ class Manta50Panel(QDialog):
 
             ctrl_state_match = re.search(r"(CtrlState:)\s*(\d+)", decoded_message)
             if ctrl_state_match:
-                updated_message = replace_enum_values(ctrl_state_match.group(0))
+                if self.MotorID:
+                    self.progressValue += 1
+                    self.Motor_ID_list.append(ctrl_state_match.group(0))
+                    updated_message = replace_enum_values(ctrl_state_match.group(0))
                 self.CtrlState_display.appendPlainText(updated_message)
 
             est_state_match = re.search(r"(EstState:)\s*(\d+)", decoded_message)
             if est_state_match:
+                if self.MotorID:
+                    self.progressValue += 1
+                    self.Motor_ID_list.append(est_state_match.group(0))
                 updated_message = replace_enum_values(est_state_match.group(0))
                 self.EstState_display.appendPlainText(updated_message)
+            self.progressBar.setValue(self.progressValue)
+            self.updateProgressBarStyle(self.progressValue)
+            if len(self.Motor_ID_pattern) == self.progressValue:
+                difference1 = set(self.Motor_ID_pattern) - set(self.Motor_ID_list)
+                difference2 = set(self.Motor_ID_list) - set(self.Motor_ID_pattern)
+                if not difference1 and not difference2:
+                    print("Motor ID OK")
+                    self.MotorID = False
+                    self.MotorOK = True
 
         if message.level.value == INFO:
             self.set_checkboxes_from_byte(0)
@@ -814,6 +877,55 @@ class Manta50Panel(QDialog):
         self.current_index = com_index + 1
         control_word = self.get_byte_from_checkboxes()
         QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
+
+    def start_motor_id(self):
+        # self.MotorRrogressCtrl = []
+        # self.MotorRrogressEst = []
+        self.CtrlState_display.clear()
+        self.EstState_display.clear()
+        self.Motor_ID_list = []
+        self.MotorID = True
+        self.MotorOK = False
+        self.progressValue = 0
+        self.progressBar.setValue(self.progressValue)
+        # if self.progressValue >= 11:
+        #     self.progressValue = 0
+        #     self.progressBar.setValue(0)
+        #     self.MotorID = False
+        # else:
+        #     self.progressValue += 1
+        #     self.progressBar.setValue(self.progressValue)
+
+    def updateProgressBarStyle(self, value):
+
+        if value <= (len(self.Motor_ID_pattern) / 2):
+            red = 255
+            green = int((value / (len(self.Motor_ID_pattern) / 2)) * 255)
+        else:
+            red = 255 - int(
+                (
+                    (value - (len(self.Motor_ID_pattern) / 2))
+                    / (len(self.Motor_ID_pattern) / 2)
+                )
+                * 255
+            )
+            green = 255
+
+        color = f"background-color: rgb({red}, {green}, 0);"
+
+        # Применяем стили к прогресс-бару
+        self.progressBar.setStyleSheet(
+            f"""
+            QProgressBar {{
+                border: 2px solid grey;
+                border-radius: 5px;
+                text-align: center;
+            }}
+            QProgressBar::chunk {{
+                {color}
+            }}
+        """
+        )
 
     def labelWidget(self, label, widgets):
         """a widget with a label"""
