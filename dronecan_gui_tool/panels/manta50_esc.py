@@ -894,37 +894,39 @@ class Manta50Panel(QDialog):
             else:
                 raise ValueError(f"No Name: {bit_name}")
         return byte
-
-    def set_reset_control_word(self, flag):
-        com_index = self.param_index["Control Word"][0]
-        self.current_index = com_index + 1
-        control_word = self.get_byte_from_checkboxes()
-        if flag:
-            control_word = self.set_bits_by_names(
-                control_word, ["Reset", "RunIdentify"]
-            )
-        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
-
-    def start_motor_id(self):
+    
+    def set_ui_state(self, set=False):
+        self.progressBar.resetFormat()
         self.CtrlState_display.clear()
         self.EstState_display.clear()
         self.Motor_ID_list = []
-        self.MotorID = True
+        self.MotorID = False
         self.MotorOK = False
+        if set:                
+            self.MotorID = True
+            self.MotorOK = False
         self.progressValue = 0
         self.progressBar.setValue(self.progressValue)
+
+    def start_motor_id(self):
+        control_word = self.get_byte_from_checkboxes()
+        if control_word == 0:
+            self.set_ui_state()
+            self.progressBar.setFormat("need to Fetch all parameters: %p%")
+            return
+        self.set_ui_state(set=True)
         self.nodeid = int(self.node_select.currentText().split(":")[0])
+        control_word = self.clear_bits_by_names(
+            control_word, ["enableSys", "runIdentify", "UserParams"]
+        )
         com_index = self.param_index["Control Word"][0]
         self.current_index = com_index + 1
-        control_word = self.get_byte_from_checkboxes()
-        print(control_word)
-        control_word = self.clear_bits_by_names(
-            control_word, ["UserParams"] # "runIdentify"
+        QTimer.singleShot(1584, lambda: self.send_value(com_index, control_word))
+
+        control_word = self.set_bits_by_names(
+            control_word, ["enableSys", "runIdentify"]
         )
-        # print(control_word)
-        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
-        control_word = self.set_bits_by_names(control_word, ["runIdentify"])
-        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
+        QTimer.singleShot(3118, lambda: self.send_value(com_index, control_word))
 
     def updateProgressBarStyle(self, value):
 
