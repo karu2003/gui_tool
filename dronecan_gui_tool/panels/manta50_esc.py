@@ -49,6 +49,7 @@ _singleton = None
 
 DEBUG = 0
 INFO = 1
+waiting_time = 789  # * 2
 
 
 class CTRL_State(Enum):
@@ -79,56 +80,24 @@ class EST_State(Enum):
 
 class USER_ErrorCode(Enum):
     USER_ErrorCode_NoError = 0  # no error error code
-    USER_ErrorCode_iqFullScaleCurrent_A_High = (
-        1  # iqFullScaleCurrent_A too high error code
-    )
-    USER_ErrorCode_iqFullScaleCurrent_A_Low = (
-        2  # iqFullScaleCurrent_A too low error code
-    )
-    USER_ErrorCode_iqFullScaleVoltage_V_High = (
-        3  # iqFullScaleVoltage_V too high error code
-    )
-    USER_ErrorCode_iqFullScaleVoltage_V_Low = (
-        4  # iqFullScaleVoltage_V too low error code
-    )
+    USER_ErrorCode_iqFullScaleCurrent_A_High = 1  # iqFullScaleCurrent_A too high error code
+    USER_ErrorCode_iqFullScaleCurrent_A_Low = 2  # iqFullScaleCurrent_A too low error code
+    USER_ErrorCode_iqFullScaleVoltage_V_High = 3  # iqFullScaleVoltage_V too high error code
+    USER_ErrorCode_iqFullScaleVoltage_V_Low = 4  # iqFullScaleVoltage_V too low error code
     USER_ErrorCode_iqFullScaleFreq_Hz_High = 5  # iqFullScaleFreq_Hz too high error code
     USER_ErrorCode_iqFullScaleFreq_Hz_Low = 6  # iqFullScaleFreq_Hz too low error code
-    USER_ErrorCode_numPwmTicksPerIsrTick_High = (
-        7  # numPwmTicksPerIsrTick too high error code
-    )
-    USER_ErrorCode_numPwmTicksPerIsrTick_Low = (
-        8  # numPwmTicksPerIsrTick too low error code
-    )
-    USER_ErrorCode_numIsrTicksPerCtrlTick_High = (
-        9  # numIsrTicksPerCtrlTick too high error code
-    )
-    USER_ErrorCode_numIsrTicksPerCtrlTick_Low = (
-        10  # numIsrTicksPerCtrlTick too low error code
-    )
-    USER_ErrorCode_numCtrlTicksPerCurrentTick_High = (
-        11  # numCtrlTicksPerCurrentTick too high error code
-    )
-    USER_ErrorCode_numCtrlTicksPerCurrentTick_Low = (
-        12  # numCtrlTicksPerCurrentTick too low error code
-    )
-    USER_ErrorCode_numCtrlTicksPerEstTick_High = (
-        13  # numCtrlTicksPerEstTick too high error code
-    )
-    USER_ErrorCode_numCtrlTicksPerEstTick_Low = (
-        14  # numCtrlTicksPerEstTick too low error code
-    )
-    USER_ErrorCode_numCtrlTicksPerSpeedTick_High = (
-        15  # numCtrlTicksPerSpeedTick too high error code
-    )
-    USER_ErrorCode_numCtrlTicksPerSpeedTick_Low = (
-        16  # numCtrlTicksPerSpeedTick too low error code
-    )
-    USER_ErrorCode_numCtrlTicksPerTrajTick_High = (
-        17  # numCtrlTicksPerTrajTick too high error code
-    )
-    USER_ErrorCode_numCtrlTicksPerTrajTick_Low = (
-        18  # numCtrlTicksPerTrajTick too low error code
-    )
+    USER_ErrorCode_numPwmTicksPerIsrTick_High = 7  # numPwmTicksPerIsrTick too high error code
+    USER_ErrorCode_numPwmTicksPerIsrTick_Low = 8  # numPwmTicksPerIsrTick too low error code
+    USER_ErrorCode_numIsrTicksPerCtrlTick_High = 9  # numIsrTicksPerCtrlTick too high error code
+    USER_ErrorCode_numIsrTicksPerCtrlTick_Low = 10  # numIsrTicksPerCtrlTick too low error code
+    USER_ErrorCode_numCtrlTicksPerCurrentTick_High = 11  # numCtrlTicksPerCurrentTick too high error code
+    USER_ErrorCode_numCtrlTicksPerCurrentTick_Low = 12  # numCtrlTicksPerCurrentTick too low error code
+    USER_ErrorCode_numCtrlTicksPerEstTick_High = 13  # numCtrlTicksPerEstTick too high error code
+    USER_ErrorCode_numCtrlTicksPerEstTick_Low = 14  # numCtrlTicksPerEstTick too low error code
+    USER_ErrorCode_numCtrlTicksPerSpeedTick_High = 15  # numCtrlTicksPerSpeedTick too high error code
+    USER_ErrorCode_numCtrlTicksPerSpeedTick_Low = 16  # numCtrlTicksPerSpeedTick too low error code
+    USER_ErrorCode_numCtrlTicksPerTrajTick_High = 17  # numCtrlTicksPerTrajTick too high error code
+    USER_ErrorCode_numCtrlTicksPerTrajTick_Low = 18  # numCtrlTicksPerTrajTick too low error code
     USER_ErrorCode_numCurrentSensors_High = 19  # numCurrentSensors too high error code
     USER_ErrorCode_numCurrentSensors_Low = 20  # numCurrentSensors too low error code
     USER_ErrorCode_numVoltageSensors_High = 21  # numVoltageSensors too high error code
@@ -153,12 +122,8 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_dcBusPole_rps_Low = 40  # dcBusPole_rps too low error code
     USER_ErrorCode_fluxFraction_High = 41  # fluxFraction too high error code
     USER_ErrorCode_fluxFraction_Low = 42  # fluxFraction too low error code
-    USER_ErrorCode_indEst_speedMaxFraction_High = (
-        43  # indEst_speedMaxFraction too high error code
-    )
-    USER_ErrorCode_indEst_speedMaxFraction_Low = (
-        44  # indEst_speedMaxFraction too low error code
-    )
+    USER_ErrorCode_indEst_speedMaxFraction_High = 43  # indEst_speedMaxFraction too high error code
+    USER_ErrorCode_indEst_speedMaxFraction_Low = 44  # indEst_speedMaxFraction too low error code
     USER_ErrorCode_powerWarpGain_High = 45  # powerWarpGain too high error code
     USER_ErrorCode_powerWarpGain_Low = 46  # powerWarpGain too low error code
     USER_ErrorCode_systemFreq_MHz_High = 47  # systemFreq_MHz too high error code
@@ -169,20 +134,14 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_voltage_sf_Low = 52  # voltage_sf too low error code
     USER_ErrorCode_current_sf_High = 53  # current_sf too high error code
     USER_ErrorCode_current_sf_Low = 54  # current_sf too low error code
-    USER_ErrorCode_voltageFilterPole_Hz_High = (
-        55  # voltageFilterPole_Hz too high error code
-    )
-    USER_ErrorCode_voltageFilterPole_Hz_Low = (
-        56  # voltageFilterPole_Hz too low error code
-    )
+    USER_ErrorCode_voltageFilterPole_Hz_High = 55  # voltageFilterPole_Hz too high error code
+    USER_ErrorCode_voltageFilterPole_Hz_Low = 56  # voltageFilterPole_Hz too low error code
     USER_ErrorCode_maxVsMag_pu_High = 57  # maxVsMag_pu too high error code
     USER_ErrorCode_maxVsMag_pu_Low = 58  # maxVsMag_pu too low error code
     USER_ErrorCode_estKappa_High = 59  # estKappa too high error code
     USER_ErrorCode_estKappa_Low = 60  # estKappa too low error code
     USER_ErrorCode_motor_type_Unknown = 61  # motor type unknown error code
-    USER_ErrorCode_motor_numPolePairs_High = (
-        62  # motor_numPolePairs too high error code
-    )
+    USER_ErrorCode_motor_numPolePairs_High = 62  # motor_numPolePairs too high error code
     USER_ErrorCode_motor_numPolePairs_Low = 63  # motor_numPolePairs too low error code
     USER_ErrorCode_motor_ratedFlux_High = 64  # motor_ratedFlux too high error code
     USER_ErrorCode_motor_ratedFlux_Low = 65  # motor_ratedFlux too low error code
@@ -202,26 +161,14 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_maxCurrent_indEst_Low = 79  # maxCurrent_indEst too low error code
     USER_ErrorCode_maxCurrentSlope_High = 80  # maxCurrentSlope too high error code
     USER_ErrorCode_maxCurrentSlope_Low = 81  # maxCurrentSlope too low error code
-    USER_ErrorCode_maxCurrentSlope_powerWarp_High = (
-        82  # maxCurrentSlope_powerWarp too high error code
-    )
-    USER_ErrorCode_maxCurrentSlope_powerWarp_Low = (
-        83  # maxCurrentSlope_powerWarp too low error code
-    )
+    USER_ErrorCode_maxCurrentSlope_powerWarp_High = 82  # maxCurrentSlope_powerWarp too high error code
+    USER_ErrorCode_maxCurrentSlope_powerWarp_Low = 83  # maxCurrentSlope_powerWarp too low error code
     USER_ErrorCode_IdRated_High = 84  # IdRated too high error code
     USER_ErrorCode_IdRated_Low = 85  # IdRated too low error code
-    USER_ErrorCode_IdRatedFraction_indEst_High = (
-        86  # IdRatedFraction_indEst too high error code
-    )
-    USER_ErrorCode_IdRatedFraction_indEst_Low = (
-        87  # IdRatedFraction_indEst too low error code
-    )
-    USER_ErrorCode_IdRatedFraction_ratedFlux_High = (
-        88  # IdRatedFraction_ratedFlux too high error code
-    )
-    USER_ErrorCode_IdRatedFraction_ratedFlux_Low = (
-        89  # IdRatedFraction_ratedFlux too low error code
-    )
+    USER_ErrorCode_IdRatedFraction_indEst_High = 86  # IdRatedFraction_indEst too high error code
+    USER_ErrorCode_IdRatedFraction_indEst_Low = 87  # IdRatedFraction_indEst too low error code
+    USER_ErrorCode_IdRatedFraction_ratedFlux_High = 88  # IdRatedFraction_ratedFlux too high error code
+    USER_ErrorCode_IdRatedFraction_ratedFlux_Low = 89  # IdRatedFraction_ratedFlux too low error code
     USER_ErrorCode_IdRated_delta_High = 90  # IdRated_delta too high error code
     USER_ErrorCode_IdRated_delta_Low = 91  # IdRated_delta too low error code
     USER_ErrorCode_fluxEstFreq_Hz_High = 92  # fluxEstFreq_Hz too high error code
@@ -236,12 +183,8 @@ class USER_ErrorCode(Enum):
     USER_ErrorCode_trajFreq_Hz_Low = 101  # trajFreq_Hz too low error code
     USER_ErrorCode_ctrlPeriod_sec_High = 102  # ctrlPeriod_sec too high error code
     USER_ErrorCode_ctrlPeriod_sec_Low = 103  # ctrlPeriod_sec too low error code
-    USER_ErrorCode_maxNegativeIdCurrent_a_High = (
-        104  # maxNegativeIdCurrent_a too high error code
-    )
-    USER_ErrorCode_maxNegativeIdCurrent_a_Low = (
-        105  # maxNegativeIdCurrent_a too low error code
-    )
+    USER_ErrorCode_maxNegativeIdCurrent_a_High = 104  # maxNegativeIdCurrent_a too high error code
+    USER_ErrorCode_maxNegativeIdCurrent_a_Low = 105  # maxNegativeIdCurrent_a too low error code
     USER_numErrorCodes = 106  # the number of user error codes
 
 
@@ -271,9 +214,7 @@ class Manta50Panel(QDialog):
     def __init__(self, parent, node):
         super(Manta50Panel, self).__init__(parent)
         self.setWindowTitle("Manta ESC Panel")
-        self.setAttribute(
-            Qt.WA_DeleteOnClose
-        )  # This is required to stop background timers!
+        self.setAttribute(Qt.WA_DeleteOnClose)  # This is required to stop background timers!
 
         # self.MotorRrogressCtrl = []
         # self.MotorRrogressEst = []
@@ -334,16 +275,8 @@ class Manta50Panel(QDialog):
         self.current_index = 0
         self.messages = {}
 
-        self.integer_params_key = [
-            key
-            for key, (index, param_type) in self.param_index.items()
-            if param_type is int
-        ]
-        self.integer_params_index = [
-            index
-            for key, (index, param_type) in self.param_index.items()
-            if param_type is int
-        ]
+        self.integer_params_key = [key for key, (index, param_type) in self.param_index.items() if param_type is int]
+        self.integer_params_index = [index for key, (index, param_type) in self.param_index.items() if param_type is int]
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -355,7 +288,8 @@ class Manta50Panel(QDialog):
         layout.addLayout(self.labelWidget("Node", self.node_select))
 
         fetch = QHBoxLayout()
-        self.fetch_label = QLabel("Fetch all parameters by index about 10s")
+        self.fetch_label = QLabel("Fetch all parameters by index about 20s")
+        self.fetch_label.setStyleSheet("background-color: red; color: white;")
         self.fetch_set = QPushButton("Fetch All", self)
         self.fetch_set.clicked.connect(self.send_param_requests)
 
@@ -421,15 +355,13 @@ class Manta50Panel(QDialog):
         self.esc_index.setValue(0)
         self.esc_index_set = QPushButton("Set", self)
         self.esc_index_set.clicked.connect(self.on_esc_index_set)
-        layout.addLayout(
-            self.labelWidget("ESC Index:", [self.esc_index, self.esc_index_set])
-        )
+        layout.addLayout(self.labelWidget("ESC Index:", [self.esc_index, self.esc_index_set]))
 
         # 2
         self.arming = QCheckBox(self)
         self.arming_set = QPushButton("Set", self)
         self.arming_set.clicked.connect(self.on_arming_set)
-        layout.addLayout(self.labelWidget("Arming", [self.arming, self.arming_set]))
+        layout.addLayout(self.labelWidget("Arming Request", [self.arming, self.arming_set]))
 
         # 3
         self.tele_rate = QComboBox(self)
@@ -438,9 +370,7 @@ class Manta50Panel(QDialog):
         self.tele_rate.setCurrentText("25")
         self.tele_rate_set = QPushButton("Set", self)
         self.tele_rate_set.clicked.connect(self.on_tele_rate_set)
-        layout.addLayout(
-            self.labelWidget("Telemetry Rate Hz:", [self.tele_rate, self.tele_rate_set])
-        )
+        layout.addLayout(self.labelWidget("Telemetry Rate Hz:", [self.tele_rate, self.tele_rate_set]))
 
         # 4
         self.baudrate = QComboBox(self)
@@ -449,9 +379,7 @@ class Manta50Panel(QDialog):
         self.baudrate.setCurrentText(list(self.bmap.keys())[1])
         self.baudrate_set = QPushButton("Set", self)
         self.baudrate_set.clicked.connect(self.on_baudrate_set)
-        layout.addLayout(
-            self.labelWidget("CAN Speed:", [self.baudrate, self.baudrate_set])
-        )
+        layout.addLayout(self.labelWidget("CAN Speed:", [self.baudrate, self.baudrate_set]))
         # 5
         self.max_speed = QDoubleSpinBox(self)
         self.max_speed.setMinimum(0.0)
@@ -459,11 +387,7 @@ class Manta50Panel(QDialog):
         self.max_speed.setValue(5.0)
         self.max_speed_set = QPushButton("Set", self)
         self.max_speed_set.clicked.connect(self.on_max_speed_set)
-        layout.addLayout(
-            self.labelWidget(
-                "Motor Max Speed KRPM:", [self.max_speed, self.max_speed_set]
-            )
-        )
+        layout.addLayout(self.labelWidget("Motor Max Speed KRPM:", [self.max_speed, self.max_speed_set]))
         # 6
         self.checkboxes = {
             "enableSys": QCheckBox("Enable System", self),
@@ -486,9 +410,7 @@ class Manta50Panel(QDialog):
         self.midle_point = QCheckBox(self)
         self.midle_point_set = QPushButton("Set", self)
         self.midle_point_set.clicked.connect(self.on_midle_point_set)
-        layout.addLayout(
-            self.labelWidget("Midle Point", [self.midle_point, self.midle_point_set])
-        )
+        layout.addLayout(self.labelWidget("Midle Point", [self.midle_point, self.midle_point_set]))
 
         # 8
         self.acceleration = QDoubleSpinBox(self)
@@ -497,11 +419,7 @@ class Manta50Panel(QDialog):
         self.acceleration.setValue(2.0)
         self.acceleration_set = QPushButton("Set", self)
         self.acceleration_set.clicked.connect(self.on_acceleration_set)
-        layout.addLayout(
-            self.labelWidget(
-                "Acceleration KRPM:", [self.acceleration, self.acceleration_set]
-            )
-        )
+        layout.addLayout(self.labelWidget("Acceleration KRPM:", [self.acceleration, self.acceleration_set]))
 
         # 9
         self.motor_poles = QSpinBox(self)
@@ -510,9 +428,7 @@ class Manta50Panel(QDialog):
         self.motor_poles.setValue(14)
         self.motor_poles_set = QPushButton("Set", self)
         self.motor_poles_set.clicked.connect(self.on_motor_poles_set)
-        layout.addLayout(
-            self.labelWidget("Motor Poles:", [self.motor_poles, self.motor_poles_set])
-        )
+        layout.addLayout(self.labelWidget("Motor Poles:", [self.motor_poles, self.motor_poles_set]))
 
         # 10
         self.kp = QDoubleSpinBox(self)
@@ -541,29 +457,44 @@ class Manta50Panel(QDialog):
         self.startButton = QPushButton("Start Motor ID", self)
         self.startButton.clicked.connect(self.start_motor_id)
 
+        self.motor_OK_label = QLabel(self)
+        self.motor_OK_label.setStyleSheet("background-color: red;")
+        self.motor_OK_label.setFixedWidth(77)
+
         # self.progressTimer = QTimer(self)
         # self.progressTimer.timeout.connect(self.updateProgress)
 
         layoutProgress = QHBoxLayout()
         layoutProgress.addWidget(self.progressBar)
         layoutProgress.addWidget(self.startButton)
+        layoutProgress.addWidget(self.motor_OK_label)
         layout.addLayout(layoutProgress)
 
         self.setLayout(layout)
         self.resize(1200, 450)
 
         self.handlers = [
-            node.add_handler(
-                dronecan.uavcan.protocol.debug.LogMessage, self.handle_debug_log_message
-            ),
+            node.add_handler(dronecan.uavcan.protocol.debug.LogMessage, self.handle_debug_log_message),
         ]
 
-        QTimer.singleShot(767, self.update_nodes)
+        QTimer.singleShot(waiting_time, self.update_nodes)
 
     def send_param_requests(self):
-        self.fetch_label.setText("Fetch all parameters by index about 10s")
+        self.fetch_label.setText("Fetch all parameters by index about 20s")
+        self.fetch_label.setStyleSheet("background-color: red; color: white;")
         self.messages = {}
-        self.nodeid = int(self.node_select.currentText().split(":")[0])
+
+        current_text = self.node_select.currentText()
+        if not current_text:
+            print("Error: No node selected")
+            return
+
+        try:
+            self.nodeid = int(current_text.split(":")[0])
+        except ValueError:
+            print(f"Error: Invalid node ID format: {current_text}")
+            return
+
         self.current_index = 0
         self.timer = QTimer()
         self.timer.timeout.connect(self.send_next_request)
@@ -571,9 +502,7 @@ class Manta50Panel(QDialog):
 
     def send_next_request(self):
         if self.current_index < len(self.param_index):
-            request = dronecan.uavcan.protocol.param.GetSet.Request(
-                index=self.current_index
-            )
+            request = dronecan.uavcan.protocol.param.GetSet.Request(index=self.current_index)
             self._node.request(request, self.nodeid, self.empty_callback)
             self.current_index += 1
         else:
@@ -626,9 +555,7 @@ class Manta50Panel(QDialog):
             decoded_message = message.text.decode("utf-8")
             updated_message = replace_enum_values(decoded_message)
 
-            user_error_code_match = re.search(
-                r"(UserErrorCode:)\s*(\d+)", decoded_message
-            )
+            user_error_code_match = re.search(r"(UserErrorCode:)\s*(\d+)", decoded_message)
             if user_error_code_match:
                 updated_message = replace_enum_values(user_error_code_match.group(0))
                 self.UserErrorCode_display.appendPlainText(updated_message)
@@ -654,6 +581,7 @@ class Manta50Panel(QDialog):
                 difference1 = set(self.Motor_ID_pattern) - set(self.Motor_ID_list)
                 difference2 = set(self.Motor_ID_list) - set(self.Motor_ID_pattern)
                 if not difference1 and not difference2:
+                    self.motor_OK_label.setStyleSheet("background-color: green;")
                     print("Motor ID OK")
                     self.MotorID = False
                     self.MotorOK = True
@@ -673,6 +601,7 @@ class Manta50Panel(QDialog):
 
             if len(self.messages) == len(self.param_index):
                 self.fetch_label.setText("All parameters fetched")
+                self.fetch_label.setStyleSheet("background-color: green; color: white;")
                 self.table.resizeColumnsToContents()
                 self.table.resizeRowsToContents()
 
@@ -685,7 +614,13 @@ class Manta50Panel(QDialog):
         column_index = self.param_index.get(param_name, [None])[0]
         if column_index is not None:
             item = self.table.item(1, column_index)
-            return convert_func(item.text())
+            value = item.text()
+            try:
+                return convert_func(value)
+            except ValueError:
+                if convert_func == int:
+                    return int(float(value))
+                raise
         return None
 
     def update_ui_from_params(self):
@@ -759,7 +694,7 @@ class Manta50Panel(QDialog):
 
     def update_nodes(self):
         """update list of available nodes"""
-        QTimer.singleShot(767, self.update_nodes)
+        QTimer.singleShot(waiting_time, self.update_nodes)
         from ..widgets.node_monitor import app_node_monitor
 
         if app_node_monitor is None:
@@ -772,9 +707,7 @@ class Manta50Panel(QDialog):
             else:
                 node_list.append("%u" % nid)
         node_list = sorted(node_list)
-        current_node = sorted(
-            [self.node_select.itemText(i) for i in range(self.node_select.count())]
-        )
+        current_node = sorted([self.node_select.itemText(i) for i in range(self.node_select.count())])
         for n in node_list:
             if not n in current_node:
                 self.node_select.addItem(n)
@@ -785,78 +718,78 @@ class Manta50Panel(QDialog):
         self.current_index = com_index + 1
         baudrate = self.baudrate.currentText()
         baud = self.bmap[baudrate]
-        QTimer.singleShot(767, lambda: self.send_value(com_index, int(baud)))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, int(baud)))
 
     def on_esc_index_set(self):
         """set esc index"""
         com_index = self.param_index["ESC Index"][0]
         self.current_index = com_index + 1
         esc_index = int(self.esc_index.value())
-        QTimer.singleShot(767, lambda: self.send_value(com_index, esc_index))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, esc_index))
 
     def on_nodeid_set(self):
         """set node ID"""
         com_index = self.param_index["Node ID"][0]
         self.current_index = com_index + 1
         node_iid = int(self.node_id.value())
-        QTimer.singleShot(767, lambda: self.send_value(com_index, node_iid))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, node_iid))
 
     def on_tele_rate_set(self):
         """set tele rate"""
         com_index = self.param_index["Telemetry Rate"][0]
         self.current_index = com_index + 1
         t_rate = int(self.tele_rate.currentText())
-        QTimer.singleShot(767, lambda: self.send_value(com_index, t_rate))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, t_rate))
 
     def on_max_speed_set(self):
         """set motor max speed"""
         com_index = self.param_index["Max Speed"][0]
         self.current_index = com_index + 1
         max_speed = self.max_speed.value()
-        QTimer.singleShot(767, lambda: self.send_value(com_index, max_speed))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, max_speed))
 
     def on_acceleration_set(self):
         """set motor max speed"""
         com_index = self.param_index["Acceleration"][0]
         self.current_index = com_index + 1
         acceleration = self.acceleration.value()
-        QTimer.singleShot(767, lambda: self.send_value(com_index, acceleration))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, acceleration))
 
     def on_arming_set(self):
         """set arming"""
         com_index = self.param_index["Arming"][0]
         self.current_index = com_index + 1
         arming = 1 if self.arming.isChecked() else 0
-        print("Arming", arming)
-        QTimer.singleShot(767, lambda: self.send_value(com_index, arming))
+        # print("Arming", arming)
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, arming))
 
     def on_midle_point_set(self):
         """set midle point"""
         com_index = self.param_index["Midle Point"][0]
         self.current_index = com_index + 1
         midle_point = 1 if self.midle_point.isChecked() else 0
-        QTimer.singleShot(767, lambda: self.send_value(com_index, midle_point))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, midle_point))
 
     def on_motor_poles_set(self):
         """set motor poles"""
         com_index = self.param_index["Motor Poles"][0]
         self.current_index = com_index + 1
         motor_poles = int(self.motor_poles.value())
-        QTimer.singleShot(767, lambda: self.send_value(com_index, motor_poles))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, motor_poles))
 
     def on_kp_set(self):
         """set kp"""
         com_index = self.param_index["KP"][0]
         self.current_index = com_index + 1
         kp = self.kp.value()
-        QTimer.singleShot(767, lambda: self.send_value(com_index, kp))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, kp))
 
     def on_ki_set(self):
         """set ki"""
         com_index = self.param_index["KI"][0]
         self.current_index = com_index + 1
         ki = self.ki.value()
-        QTimer.singleShot(767, lambda: self.send_value(com_index, ki))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, ki))
 
     def get_byte_from_checkboxes(self):
         byte = 0
@@ -873,7 +806,7 @@ class Manta50Panel(QDialog):
         com_index = self.param_index["Control Word"][0]
         self.current_index = com_index + 1
         control_word = self.get_byte_from_checkboxes()
-        QTimer.singleShot(767, lambda: self.send_value(com_index, control_word))
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, control_word))
 
     def set_bits_by_names(self, byte, bit_names):
 
@@ -894,7 +827,7 @@ class Manta50Panel(QDialog):
             else:
                 raise ValueError(f"No Name: {bit_name}")
         return byte
-    
+
     def set_ui_state(self, set=False):
         self.progressBar.resetFormat()
         self.CtrlState_display.clear()
@@ -902,11 +835,33 @@ class Manta50Panel(QDialog):
         self.Motor_ID_list = []
         self.MotorID = False
         self.MotorOK = False
-        if set:                
+        if set:
             self.MotorID = True
             self.MotorOK = False
         self.progressValue = 0
         self.progressBar.setValue(self.progressValue)
+
+    def are_bits_cleared(self, byte, bit_names):
+        for bit_name in bit_names:
+            if bit_name in self.bit_positions:
+                bit_position = self.bit_positions[bit_name]
+                if byte & (1 << bit_position):
+                    return False
+        return True
+
+    def send_control_word(self, control_word, bit_names, action):
+        com_index = self.param_index["Control Word"][0]
+        self.current_index = com_index + 1
+
+        if action == "clear":
+            control_word = self.clear_bits_by_names(control_word, bit_names)
+        elif action == "set":
+            control_word = self.set_bits_by_names(control_word, bit_names)
+        else:
+            raise ValueError(f"Invalid action: {action}")
+
+        self.send_value(com_index, control_word)
+        return control_word
 
     def start_motor_id(self):
         control_word = self.get_byte_from_checkboxes()
@@ -914,19 +869,44 @@ class Manta50Panel(QDialog):
             self.set_ui_state()
             self.progressBar.setFormat("need to Fetch all parameters: %p%")
             return
+
+        if not self.arming.isChecked():
+            self.progressBar.setFormat("for motor ID need Set Arming Request > Set: %p%")
+            return
+
+        self.motor_OK_label.setStyleSheet("background-color: red;")
+
+        # if not self.are_bits_cleared(
+        #     control_word, ["enableSys", "runIdentify", "UserParams"]
+        # ):
+        #     self.progressBar.setFormat(
+        #         "reset bits enableSys, runIdentify, UserParams > Set: %p%"
+        #     )
+        #     return
+
         self.set_ui_state(set=True)
         self.nodeid = int(self.node_select.currentText().split(":")[0])
-        control_word = self.clear_bits_by_names(
-            control_word, ["enableSys", "runIdentify", "UserParams"]
-        )
+
+        # com_index = self.param_index["Arming"][0]
+        # self.current_index = com_index + 1
+        # QTimer.singleShot(1584, lambda: self.send_value(com_index, 1))
+
         com_index = self.param_index["Control Word"][0]
         self.current_index = com_index + 1
-        QTimer.singleShot(1584, lambda: self.send_value(com_index, control_word))
 
-        control_word = self.set_bits_by_names(
-            control_word, ["enableSys", "runIdentify"]
-        )
-        QTimer.singleShot(3118, lambda: self.send_value(com_index, control_word))
+        # control_word = self.clear_bits_by_names(
+        #     control_word, ["enableSys", "runIdentify", "UserParams"]
+        # )
+        for i in range(5):
+            QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, 60))
+        for i in range(5):
+            QTimer.singleShot(waiting_time * 4, lambda: self.send_value(com_index, 63))
+
+        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["UserParams"], "clear"))
+        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["runIdentify"], "clear"))
+        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["enableSys"], "clear"))
+        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["enableSys"], "set"))
+        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["runIdentify"], "set"))
 
     def updateProgressBarStyle(self, value):
 
@@ -934,13 +914,7 @@ class Manta50Panel(QDialog):
             red = 255
             green = int((value / (len(self.Motor_ID_pattern) / 2)) * 255)
         else:
-            red = 255 - int(
-                (
-                    (value - (len(self.Motor_ID_pattern) / 2))
-                    / (len(self.Motor_ID_pattern) / 2)
-                )
-                * 255
-            )
+            red = 255 - int(((value - (len(self.Motor_ID_pattern) / 2)) / (len(self.Motor_ID_pattern) / 2)) * 255)
             green = 255
 
         color = f"background-color: rgb({red}, {green}, 0);"
