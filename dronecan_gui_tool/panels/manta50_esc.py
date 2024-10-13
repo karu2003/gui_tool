@@ -38,6 +38,8 @@ import base64
 import struct
 from enum import Enum
 import re
+import time
+import json
 
 __all__ = "PANEL_NAME", "spawn", "get_icon"
 
@@ -49,7 +51,10 @@ _singleton = None
 
 DEBUG = 0
 INFO = 1
-waiting_time = 789  # * 2
+WARNING = 2
+ERROR = 3
+waiting_time = int(789)  # * 2
+REQUEST_PRIORITY = 30
 
 
 class CTRL_State(Enum):
@@ -188,6 +193,52 @@ class USER_ErrorCode(Enum):
     USER_numErrorCodes = 106  # the number of user error codes
 
 
+class DataSender:
+    def __init__(self, com_index, timeout, external_parts, send_value_func):
+        self.com_index = com_index  # Индекс для передачи данных
+        self.timeout = timeout * 1000  # Тайм-аут в миллисекундах
+        self.parts = external_parts  # Внешний список, который заполняется другой функцией
+        self.external_values = []  # Список внешних значений для отправки
+        self.send_value_func = send_value_func  # Ссылка на функцию из main
+
+        # Таймер для отправки данных
+        self.send_timer = QTimer()
+        self.send_timer.timeout.connect(self.send_data)
+
+        # Таймер для завершения цикла по тайм-ауту
+        self.timeout_timer = QTimer()
+        self.timeout_timer.setSingleShot(True)  # Однократный таймер
+        self.timeout_timer.timeout.connect(self.timeout_reached)
+
+    def start(self):
+        # Запускаем периодическую передачу данных каждые 100 мс
+        self.send_timer.start(100)
+
+        # Запускаем таймер для отслеживания тайм-аута
+        self.timeout_timer.start(self.timeout)
+
+    def send_data(self):
+        if self.external_values:  # Проверяем, есть ли внешние значения для отправки
+            value_to_send = self.external_values.pop(0)
+            print("value_to_send", value_to_send)
+            # Вызов функции send_value из main
+            self.send_value_func(self.com_index, value_to_send)
+
+        # Проверяем, появились ли данные во внешнем списке self.parts
+        if self.parts:  # Если внешний список не пуст
+            print("Данные получены в внешнем self.parts:", self.parts)
+            self.send_timer.stop()  # Останавливаем передачу данных
+            self.timeout_timer.stop()  # Останавливаем тайм-аут
+
+    def timeout_reached(self):
+        print("Тайм-аут. Данные в внешнем списке не появились.")
+        self.send_timer.stop()  # Останавливаем передачу данных
+
+    def receive_external_value(self, value):
+        # Этот метод вызывается внешней функцией для добавления значений
+        self.external_values.append(value)
+
+
 def replace_enum_values(message):
     def replace_match(match):
         prefix = match.group(1)
@@ -248,6 +299,13 @@ class Manta50Panel(QDialog):
             "Motor Poles": (9, int),
             "KP": (10, float),
             "KI": (11, float),
+            # "Motor RS": (12, float),  # Added Motor RS
+            # "Motor LS D": (13, float),  # Added Motor LS D
+            # "Motor Rated Flux": (14, float),  # Added Motor Rated Flux
+            # "ID Rated": (15, float),  # Added ID Rated
+            # "Max Current Res Est": (16, float),  # Added Max Current Res Est
+            # "Max Current Ind Est": (17, float),  # Added Max Current Ind Est
+            # "Flux Est Freq": (18, float),  # Added Flux Est Freq
         }
         self.bmap = {
             "1MHz->12": 12,
@@ -274,6 +332,7 @@ class Manta50Panel(QDialog):
         self.fetch = 0
         self.current_index = 0
         self.messages = {}
+        self.parts = []
 
         self.integer_params_key = [key for key, (index, param_type) in self.param_index.items() if param_type is int]
         self.integer_params_index = [index for key, (index, param_type) in self.param_index.items() if param_type is int]
@@ -338,6 +397,22 @@ class Manta50Panel(QDialog):
         message_layout.addWidget(self.UserErrorCode_display)
 
         layout.addLayout(message_layout)
+
+        # DrvErrorCode message display
+        self.DrvErrorCode_display = QPlainTextEdit()
+        self.DrvErrorCode_display.setReadOnly(True)
+        self.DrvErrorCode_display.setFont(get_monospace_font())
+        self.DrvErrorCode_display.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.DrvErrorCode_display.setWordWrapMode(QTextOption.NoWrap)
+        self.DrvErrorCode_display.setUndoRedoEnabled(False)
+        self.DrvErrorCode_display.setContextMenuPolicy(Qt.NoContextMenu)
+        self.DrvErrorCode_display.setTabStopWidth(20)
+        self.DrvErrorCode_display.setPlaceholderText("DrvErrorCode messages")
+
+        DrvError_layout = QVBoxLayout()
+        DrvError_layout.addWidget(self.DrvErrorCode_display)
+
+        layout.addLayout(DrvError_layout)
 
         # 0
         self.node_id = QSpinBox(self)
@@ -450,25 +525,58 @@ class Manta50Panel(QDialog):
         self.ki_set.clicked.connect(self.on_ki_set)
         layout.addLayout(self.labelWidget("KI:", [self.ki, self.ki_set]))
 
-        # индикатор процесса
+        # 12 индикатор процесса
         self.progressValue = 0
         self.progressBar = QProgressBar(self)
         self.progressBar.setRange(0, 11)
         self.startButton = QPushButton("Start Motor ID", self)
         self.startButton.clicked.connect(self.start_motor_id)
+        # self.startButton.clicked.connect(partial(self.do_execute_opcode, 111))
 
         self.motor_OK_label = QLabel(self)
         self.motor_OK_label.setStyleSheet("background-color: red;")
         self.motor_OK_label.setFixedWidth(77)
-
-        # self.progressTimer = QTimer(self)
-        # self.progressTimer.timeout.connect(self.updateProgress)
 
         layoutProgress = QHBoxLayout()
         layoutProgress.addWidget(self.progressBar)
         layoutProgress.addWidget(self.startButton)
         layoutProgress.addWidget(self.motor_OK_label)
         layout.addLayout(layoutProgress)
+
+        # 13
+        opcodes = dronecan.uavcan.protocol.param.ExecuteOpcode.Request()
+
+        save = QHBoxLayout()
+        self.save_label = QLabel("Save to EEPROM")
+        self.save_set = QPushButton("Save All", self)
+        self.save_set.clicked.connect(partial(self.do_execute_opcode, opcodes.OPCODE_SAVE))
+
+        save.addWidget(self.save_label, stretch=5)
+        save.addWidget(self.save_set, stretch=1)
+
+        layout.addLayout(save)
+
+        # 14
+        erase = QHBoxLayout()
+        self.erase_label = QLabel("Write default values to EEPROM")
+        self.erase_set = QPushButton("Erase All", self)
+        self.erase_set.clicked.connect(partial(self.do_execute_opcode, opcodes.OPCODE_ERASE))
+
+        erase.addWidget(self.erase_label, stretch=5)
+        erase.addWidget(self.erase_set, stretch=1)
+
+        layout.addLayout(erase)
+
+        # 15
+        reset = QHBoxLayout()
+        self.reset_label = QLabel("Reset")
+        self.reset_set = QPushButton("Reset", self)
+        self.reset_set.clicked.connect(self.do_restart)
+
+        reset.addWidget(self.reset_label, stretch=5)
+        reset.addWidget(self.reset_set, stretch=1)
+
+        layout.addLayout(reset)
 
         self.setLayout(layout)
         self.resize(1200, 450)
@@ -503,7 +611,7 @@ class Manta50Panel(QDialog):
     def send_next_request(self):
         if self.current_index < len(self.param_index):
             request = dronecan.uavcan.protocol.param.GetSet.Request(index=self.current_index)
-            self._node.request(request, self.nodeid, self.empty_callback)
+            self._node.request(request, self.nodeid, self.empty_callback, priority=REQUEST_PRIORITY)
             self.current_index += 1
         else:
             self.timer.stop()
@@ -528,6 +636,34 @@ class Manta50Panel(QDialog):
     def empty_callback(self, event):
         pass
 
+    def do_execute_opcode(self, opcode):
+        self.nodeid = int(self.node_select.currentText().split(":")[0])
+        request = dronecan.uavcan.protocol.param.ExecuteOpcode.Request(opcode=opcode)
+        opcode_str = dronecan.value_to_constant_name(request, "opcode", keep_literal=True)
+
+        def callback(e):
+            if e is None:
+                print(f"Opcode execution response for {opcode_str}")
+            else:
+                print(f"Opcode execution response for {opcode_str}: {e.response}")
+
+        self._node.request(request, self.nodeid, callback, priority=REQUEST_PRIORITY, timeout=5000.0)
+
+    def do_restart(self):
+        # pass
+        self.nodeid = int(self.node_select.currentText().split(":")[0])
+        request = dronecan.uavcan.protocol.RestartNode.Request(
+            magic_number=dronecan.uavcan.protocol.RestartNode.Request().MAGIC_NUMBER
+        )
+
+        def callback(e):
+            if e is None:
+                print(f"Restart request timed out")
+            else:
+                print(f"Restart request response: {e.response}")
+
+        self._node.request(request, self.nodeid, callback, priority=REQUEST_PRIORITY, timeout=5000.0)
+
     def update_table(self):
         self.table.clearContents()
         self.table.setRowCount(2)
@@ -551,9 +687,9 @@ class Manta50Panel(QDialog):
 
         message = event.transfer.payload
 
-        if message.level.value != INFO:
+        if message.level.value == DEBUG:
             decoded_message = message.text.decode("utf-8")
-            updated_message = replace_enum_values(decoded_message)
+            # updated_message = replace_enum_values(decoded_message)
 
             user_error_code_match = re.search(r"(UserErrorCode:)\s*(\d+)", decoded_message)
             if user_error_code_match:
@@ -583,6 +719,8 @@ class Manta50Panel(QDialog):
                 if not difference1 and not difference2:
                     self.motor_OK_label.setStyleSheet("background-color: green;")
                     print("Motor ID OK")
+                    # self.send_param_requests()
+                    self.progressValue = 0
                     self.MotorID = False
                     self.MotorOK = True
 
@@ -591,9 +729,9 @@ class Manta50Panel(QDialog):
             self.CtrlState_display.clear()
             self.EstState_display.clear()
             self.UserErrorCode_display.clear()
-            parts = message.text.decode("utf-8").split(" ")
-            if len(parts) >= 2:
-                key, value = parts[0], " ".join(parts[1:])
+            self.parts = message.text.decode("utf-8").split(" ")
+            if len(self.parts) >= 2:
+                key, value = self.parts[0], " ".join(self.parts[1:])
                 if self.current_index - 1 in self.integer_params_index:
                     value = str(int(float(value)))
                 self.messages[key] = (self.current_index - 1, value)
@@ -606,6 +744,11 @@ class Manta50Panel(QDialog):
                 self.table.resizeRowsToContents()
 
                 self.update_ui_from_params()
+
+        if message.level.value == ERROR:
+            decoded_message = message.text.decode("utf-8")
+            updated_message = self.decode_all_faults(decoded_message)
+            self.DrvErrorCode_display.appendPlainText(updated_message)
 
     def get_param_value(self, param_name, convert_func=str):
         """
@@ -760,7 +903,6 @@ class Manta50Panel(QDialog):
         com_index = self.param_index["Arming"][0]
         self.current_index = com_index + 1
         arming = 1 if self.arming.isChecked() else 0
-        # print("Arming", arming)
         QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, arming))
 
     def on_midle_point_set(self):
@@ -870,9 +1012,10 @@ class Manta50Panel(QDialog):
             self.progressBar.setFormat("need to Fetch all parameters: %p%")
             return
 
-        if not self.arming.isChecked():
-            self.progressBar.setFormat("for motor ID need Set Arming Request > Set: %p%")
-            return
+        # if not self.arming.isChecked():
+        #     self.set_ui_state()
+        #     self.progressBar.setFormat("for motor ID need Set Arming Request > Set: %p%")
+        #     return
 
         self.motor_OK_label.setStyleSheet("background-color: red;")
 
@@ -886,27 +1029,17 @@ class Manta50Panel(QDialog):
 
         self.set_ui_state(set=True)
         self.nodeid = int(self.node_select.currentText().split(":")[0])
+        
+        self.do_execute_opcode(111)
 
         # com_index = self.param_index["Arming"][0]
         # self.current_index = com_index + 1
         # QTimer.singleShot(1584, lambda: self.send_value(com_index, 1))
 
-        com_index = self.param_index["Control Word"][0]
-        self.current_index = com_index + 1
-
-        # control_word = self.clear_bits_by_names(
-        #     control_word, ["enableSys", "runIdentify", "UserParams"]
-        # )
-        for i in range(5):
-            QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, 60))
-        for i in range(5):
-            QTimer.singleShot(waiting_time * 4, lambda: self.send_value(com_index, 63))
-
-        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["UserParams"], "clear"))
-        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["runIdentify"], "clear"))
-        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["enableSys"], "clear"))
-        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["enableSys"], "set"))
-        # QTimer.singleShot(waiting_time, lambda: self.send_control_word(control_word, ["runIdentify"], "set"))
+        # com_index = self.param_index["Control Word"][0]
+        # self.current_index = com_index + 1
+        # QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, 60))
+        # QTimer.singleShot(waiting_time * 5, lambda: self.send_value(com_index, 63))
 
     def updateProgressBarStyle(self, value):
 
@@ -932,6 +1065,121 @@ class Manta50Panel(QDialog):
             }}
         """
         )
+
+    def decode_faults(self, reg, reg_name):
+        # If the register value is zero, there are no faults
+        if reg == 0:
+            return f"{reg_name}: No faults"
+
+        faults = []
+
+        # Decoding register 0x1 (Warnings & Watchdog Reset)
+        if reg_name == "DrvError0":
+            if reg & (1 << 10):
+                faults.append("FAULT")
+            if reg & (1 << 9):
+                faults.append("RSVD (Reserved)")
+            if reg & (1 << 8):
+                faults.append("TEMP_FLAG4")
+            if reg & (1 << 7):
+                faults.append("PVDD_UVFL (Under-voltage Fault)")
+            if reg & (1 << 6):
+                faults.append("PVDD_OVFL (Over-voltage Fault)")
+            if reg & (1 << 5):
+                faults.append("VDS_STATUS")
+            if reg & (1 << 4):
+                faults.append("VCPH_UVFL (Charge Pump Under-voltage Fault)")
+            if reg & (1 << 3):
+                faults.append("TEMP_FLAG1")
+            if reg & (1 << 2):
+                faults.append("TEMP_FLAG2")
+            if reg & (1 << 1):
+                faults.append("TEMP_FLAG3")
+            if reg & (1 << 0):
+                faults.append("OTW (Over-temperature Warning)")
+
+        # Decoding register 0x2 (OV/VDS Faults)
+        elif reg_name == "DrvError1":
+            if reg & (1 << 10):
+                faults.append("VDS_HA (High-side MOSFET phase A)")
+            if reg & (1 << 9):
+                faults.append("VDS_LA (Low-side MOSFET phase A)")
+            if reg & (1 << 8):
+                faults.append("VDS_HB (High-side MOSFET phase B)")
+            if reg & (1 << 7):
+                faults.append("VDS_LB (Low-side MOSFET phase B)")
+            if reg & (1 << 6):
+                faults.append("VDS_HC (High-side MOSFET phase C)")
+            if reg & (1 << 5):
+                faults.append("VDS_LC (Low-side MOSFET phase C)")
+            if reg & (1 << 4):
+                faults.append("RSVD (Reserved)")
+            if reg & (1 << 3):
+                faults.append("SNS_C_OCP (Current Sense Over-current Phase C)")
+            if reg & (1 << 2):
+                faults.append("SNS_B_OCP (Current Sense Over-current Phase B)")
+            if reg & (1 << 1):
+                faults.append("SNS_A_OCP (Current Sense Over-current Phase A)")
+            if reg & (1 << 0):
+                faults.append("SNS_OCP (Over-current Protection Triggered)")
+
+        # Decoding register 0x3 (IC Faults)
+        elif reg_name == "DrvError2":
+            if reg & (1 << 10):
+                faults.append("PVDD_UVLO2 (Under-voltage Lockout)")
+            if reg & (1 << 9):
+                faults.append("WD_FAULT (Watchdog Fault)")
+            if reg & (1 << 8):
+                faults.append("OTSD (Over-temperature Shutdown)")
+            if reg & (1 << 7):
+                faults.append("RSVD (Reserved)")
+            if reg & (1 << 6):
+                faults.append("VREG_UV (Regulator Under-voltage)")
+            if reg & (1 << 5):
+                faults.append("AVDD_UVLO (AVDD Under-voltage Lockout)")
+            if reg & (1 << 4):
+                faults.append("VCP_LSD_UVLO2 (Charge Pump Low-side UVLO)")
+            if reg & (1 << 3):
+                faults.append("RSVD (Reserved)")
+            if reg & (1 << 2):
+                faults.append("VCPH_UVLO2 (Charge Pump High-side UVLO)")
+            if reg & (1 << 1):
+                faults.append("VCPH_OVLO (Charge Pump High-side Over-voltage Lockout)")
+            if reg & (1 << 0):
+                faults.append("VCPH_OVLO_ABS (Charge Pump High-side Over-voltage Absolute)")
+
+        # Decoding register 0x4 (VGS Faults)
+        elif reg_name == "DrvError3":
+            if reg & (1 << 10):
+                faults.append("VGS_HA (Gate-source voltage high-side phase A)")
+            if reg & (1 << 9):
+                faults.append("VGS_LA (Gate-source voltage low-side phase A)")
+            if reg & (1 << 8):
+                faults.append("VGS_HB (Gate-source voltage high-side phase B)")
+            if reg & (1 << 7):
+                faults.append("VGS_LB (Gate-source voltage low-side phase B)")
+            if reg & (1 << 6):
+                faults.append("VGS_HC (Gate-source voltage high-side phase C)")
+            if reg & (1 << 5):
+                faults.append("VGS_LC (Gate-source voltage low-side phase C)")
+
+            # Combine bits 4-0 into a single message since they are reserved
+            if reg & 0b111111:  # Check if any of the reserved bits are set
+                faults.append("RSVD (Reserved bits 4-0)")
+
+        # Join the fault messages into a single string
+        fault_string = ", ".join(faults) if faults else "No faults"
+        return f"{reg_name}: " + fault_string
+
+    def decode_all_faults(self, input_data):
+        result = ""
+        for line in input_data.strip().splitlines():
+            reg_name, reg_value = line.split(":")
+            reg_value = int(reg_value)  # Convert the register value from decimal string to integer
+            result += self.decode_faults(reg_value, reg_name) + "\n"
+
+        # Return the concatenated result, removing the last newline character
+        return result.strip()
 
     def labelWidget(self, label, widgets):
         """a widget with a label"""
