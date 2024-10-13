@@ -650,7 +650,6 @@ class Manta50Panel(QDialog):
         self._node.request(request, self.nodeid, callback, priority=REQUEST_PRIORITY, timeout=5000.0)
 
     def do_restart(self):
-        # pass
         self.nodeid = int(self.node_select.currentText().split(":")[0])
         request = dronecan.uavcan.protocol.RestartNode.Request(
             magic_number=dronecan.uavcan.protocol.RestartNode.Request().MAGIC_NUMBER
