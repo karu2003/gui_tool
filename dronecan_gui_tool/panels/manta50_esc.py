@@ -299,13 +299,10 @@ class Manta50Panel(QDialog):
             "Motor Poles": (9, int),
             "KP": (10, float),
             "KI": (11, float),
-            # "Motor RS": (12, float),  # Added Motor RS
-            # "Motor LS D": (13, float),  # Added Motor LS D
-            # "Motor Rated Flux": (14, float),  # Added Motor Rated Flux
-            # "ID Rated": (15, float),  # Added ID Rated
-            # "Max Current Res Est": (16, float),  # Added Max Current Res Est
-            # "Max Current Ind Est": (17, float),  # Added Max Current Ind Est
-            # "Flux Est Freq": (18, float),  # Added Flux Est Freq
+            "Current Res Est": (12, float),
+            "Current Ind Est": (13, float),
+            "Motor Max Current": (14, float),
+            "Flux Est Freq": (15, float),
         }
         self.bmap = {
             "1MHz->12": 12,
@@ -527,7 +524,47 @@ class Manta50Panel(QDialog):
         self.ki_set.clicked.connect(self.on_ki_set)
         layout.addLayout(self.labelWidget("KI:", [self.ki, self.ki_set]))
 
-        # 12 индикатор процесса
+        # 12
+        self.res_est = QDoubleSpinBox(self)
+        self.res_est.setMinimum(0.0)
+        self.res_est.setMaximum(20.0)
+        self.res_est.setDecimals(3)
+        self.res_est.setValue(2.0)
+        self.res_est_set = QPushButton("Set", self)
+        self.res_est_set.clicked.connect(self.on_res_est_set)
+        layout.addLayout(self.labelWidget("Res Est Current A:", [self.res_est, self.res_est_set]))
+
+        # 13
+        self.ind_est = QDoubleSpinBox(self)
+        self.ind_est.setMinimum(-20.0)
+        self.ind_est.setMaximum(0.0)
+        self.ind_est.setDecimals(3)
+        self.ind_est.setValue(-1.0)
+        self.ind_est_set = QPushButton("Set", self)
+        self.ind_est_set.clicked.connect(self.on_ind_est_set)
+        layout.addLayout(self.labelWidget("Ind Est Current A:", [self.ind_est, self.ind_est_set]))
+
+        # 14
+        self.max_current = QDoubleSpinBox(self)
+        self.max_current.setMinimum(0.0)
+        self.max_current.setMaximum(25.0)
+        self.max_current.setDecimals(3)
+        self.max_current.setValue(15.0)
+        self.max_current_set = QPushButton("Set", self)
+        self.max_current_set.clicked.connect(self.on_max_motor_current_set)
+        layout.addLayout(self.labelWidget("Max Motor Current A:", [self.max_current, self.max_current_set]))
+
+        # 15
+        self.flux_est_freq = QDoubleSpinBox(self)
+        self.flux_est_freq.setMinimum(0.0)
+        self.flux_est_freq.setMaximum(150.0)
+        self.flux_est_freq.setDecimals(3)
+        self.flux_est_freq.setValue(60.0)
+        self.flux_est_freq_set = QPushButton("Set", self)
+        self.flux_est_freq_set.clicked.connect(self.on_flux_est_freq_set)
+        layout.addLayout(self.labelWidget("Flux Est Freq Hz:", [self.flux_est_freq, self.flux_est_freq_set]))
+
+        # 16
         self.progressValue = 0
         self.progressBar = QProgressBar(self)
         self.progressBar.setRange(0, 11)
@@ -545,7 +582,7 @@ class Manta50Panel(QDialog):
         layoutProgress.addWidget(self.motor_OK_label)
         layout.addLayout(layoutProgress)
 
-        # 13
+        # 17
         opcodes = dronecan.uavcan.protocol.param.ExecuteOpcode.Request()
 
         save = QHBoxLayout()
@@ -558,7 +595,7 @@ class Manta50Panel(QDialog):
 
         layout.addLayout(save)
 
-        # 14
+        # 18
         erase = QHBoxLayout()
         self.erase_label = QLabel("Write default values to EEPROM")
         self.erase_set = QPushButton("Erase All", self)
@@ -569,7 +606,7 @@ class Manta50Panel(QDialog):
 
         layout.addLayout(erase)
 
-        # 15
+        # 19
         reset = QHBoxLayout()
         self.reset_label = QLabel("Reset")
         self.reset_set = QPushButton("Reset", self)
@@ -581,7 +618,7 @@ class Manta50Panel(QDialog):
         layout.addLayout(reset)
 
         self.setLayout(layout)
-        self.resize(1200, 450)
+        self.resize(1400, 600)
 
         self.handlers = [
             node.add_handler(dronecan.uavcan.protocol.debug.LogMessage, self.handle_debug_log_message),
@@ -702,7 +739,7 @@ class Manta50Panel(QDialog):
                 if self.MotorID:
                     self.progressValue += 1
                     self.Motor_ID_list.append(ctrl_state_match.group(0))
-                    updated_message = replace_enum_values(ctrl_state_match.group(0))
+                updated_message = replace_enum_values(ctrl_state_match.group(0))
                 self.CtrlState_display.appendPlainText(updated_message)
 
             est_state_match = re.search(r"(EstState:)\s*(\d+)", decoded_message)
@@ -836,6 +873,26 @@ class Manta50Panel(QDialog):
         if ki is not None:
             self.ki.setValue(ki)
 
+        # Update Current Res Est
+        res_est = self.get_param_value("Current Res Est", float)
+        if res_est is not None:
+            self.res_est.setValue(res_est)
+
+        # Update Current Ind Est
+        ind_est = self.get_param_value("Current Ind Est", float)
+        if ind_est is not None:
+            self.ind_est.setValue(ind_est)
+
+        # Update Max Motor Current
+        max_motor_current = self.get_param_value("Max Motor Current", float)
+        if max_motor_current is not None:
+            self.max_current.setValue(max_motor_current)
+
+        # Update Flux Est Freq
+        flux_est_freq = self.get_param_value("Flux Est Freq", float)
+        if flux_est_freq is not None:
+            self.flux_est_freq.setValue(flux_est_freq)
+
     def update_nodes(self):
         """update list of available nodes"""
         QTimer.singleShot(waiting_time, self.update_nodes)
@@ -935,6 +992,34 @@ class Manta50Panel(QDialog):
         ki = self.ki.value()
         QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, ki))
 
+    def on_res_est_set(self):
+        """set res_est"""
+        com_index = self.param_index["Current Res Est"][0]
+        self.current_index = com_index + 1
+        res_est = self.res_est.value()
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, res_est))
+
+    def on_ind_est_set(self):
+        """set ind_est"""
+        com_index = self.param_index["Current Ind Est"][0]
+        self.current_index = com_index + 1
+        ind_est = self.ind_est.value()
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, ind_est))
+
+    def on_max_motor_current_set(self):
+        """set max_motor_current"""
+        com_index = self.param_index["Max Motor Current"][0]
+        self.current_index = com_index + 1
+        max_motor_current = self.max_current.value()
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, max_motor_current))
+
+    def on_flux_est_freq_set(self):
+        """set flux_est_freq"""
+        com_index = self.param_index["Flux Est Freq"][0]
+        self.current_index = com_index + 1
+        flux_est_freq = self.flux_est_freq.value()
+        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, flux_est_freq))
+
     def get_byte_from_checkboxes(self):
         byte = 0
         for i, checkbox in enumerate(self.checkboxes.values()):
@@ -1014,34 +1099,17 @@ class Manta50Panel(QDialog):
             self.progressBar.setFormat("need to Fetch all parameters: %p%")
             return
 
-        # if not self.arming.isChecked():
-        #     self.set_ui_state()
-        #     self.progressBar.setFormat("for motor ID need Set Arming Request > Set: %p%")
-        #     return
+        if not self.arming.isChecked():
+            self.set_ui_state()
+            self.progressBar.setFormat("for motor ID need Set Arming Request > Set: %p%")
+            return
 
         self.motor_OK_label.setStyleSheet("background-color: red;")
 
-        # if not self.are_bits_cleared(
-        #     control_word, ["enableSys", "runIdentify", "UserParams"]
-        # ):
-        #     self.progressBar.setFormat(
-        #         "reset bits enableSys, runIdentify, UserParams > Set: %p%"
-        #     )
-        #     return
-
         self.set_ui_state(set=True)
         self.nodeid = int(self.node_select.currentText().split(":")[0])
-        
+
         self.do_execute_opcode(111)
-
-        # com_index = self.param_index["Arming"][0]
-        # self.current_index = com_index + 1
-        # QTimer.singleShot(1584, lambda: self.send_value(com_index, 1))
-
-        # com_index = self.param_index["Control Word"][0]
-        # self.current_index = com_index + 1
-        # QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, 60))
-        # QTimer.singleShot(waiting_time * 5, lambda: self.send_value(com_index, 63))
 
     def updateProgressBarStyle(self, value):
 
