@@ -434,8 +434,10 @@ class Manta50Panel(QDialog):
 
         # 2
         self.arming = QCheckBox(self)
+        # self.arming = QLabel("Request for manual control")
         self.arming_set = QPushButton("Set", self)
         self.arming_set.clicked.connect(self.on_arming_set)
+        # self.arming_set.clicked.connect(self.do_execute_opcode(112))
         layout.addLayout(self.labelWidget("Arming Request", [self.arming, self.arming_set]))
 
         # 3
@@ -901,8 +903,9 @@ class Manta50Panel(QDialog):
         """set arming"""
         com_index = self.param_index["Arming"][0]
         self.current_index = com_index + 1
-        arming = 1 if self.arming.isChecked() else 0
-        QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, arming))
+        self.do_execute_opcode(112)
+        # arming = 1 if self.arming.isChecked() else 0
+        # QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, arming))
 
     def on_midle_point_set(self):
         """set midle point"""
