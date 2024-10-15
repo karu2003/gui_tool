@@ -465,8 +465,12 @@ class Manta50Panel(QDialog):
         self.DrvErrorCode_display.setTabStopWidth(20)
         self.DrvErrorCode_display.setPlaceholderText("DrvErrorCode messages")
 
+        self.disp_clear_set = QPushButton("Clear Log", self)
+        self.disp_clear_set.clicked.connect(self.on_clear_set)
+
         DrvError_layout = QVBoxLayout()
         DrvError_layout.addWidget(self.DrvErrorCode_display)
+        DrvError_layout.addWidget(self.disp_clear_set)
 
         layout.addLayout(DrvError_layout)
 
@@ -1385,6 +1389,12 @@ class Manta50Panel(QDialog):
 
         # Return the concatenated result, removing the last newline character
         return result.strip()
+
+    def on_clear_set(self):
+        self.CtrlState_display.clear()
+        self.EstState_display.clear()
+        self.UserErrorCode_display.clear()
+        self.DrvErrorCode_display.clear()
 
     def labelWidget(self, label, widgets):
         """a widget with a label"""
