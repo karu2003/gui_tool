@@ -717,7 +717,7 @@ class Manta50Panel(QDialog):
         layout.addLayout(reset)
 
         self.setLayout(layout)
-        self.resize(1400, 600)
+        self.resize(1600, 600)
 
         self.handlers = [
             node.add_handler(
@@ -1001,7 +1001,7 @@ class Manta50Panel(QDialog):
             self.ind_est.setValue(ind_est)
 
         # Update Max Motor Current
-        max_motor_current = self.get_param_value("Max Motor Current", float)
+        max_motor_current = self.get_param_value("Motor Max Current", float)
         if max_motor_current is not None:
             self.max_current.setValue(max_motor_current)
 
