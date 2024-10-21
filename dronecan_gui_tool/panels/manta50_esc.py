@@ -284,7 +284,7 @@ class Manta50Panel(QDialog):
             "CAN Speed": (4, int),
             "Max Speed": (5, float),
             "Control Word": (6, int),
-            "Midle Point": (7, int),
+            "Midle Point": (7, float),
             "Acceleration": (8, float),
             "Motor Poles": (9, int),
             "KP": (10, float),
@@ -668,7 +668,7 @@ class Manta50Panel(QDialog):
     def send_value(self, index, value):
         self.nodeid = int(self.node_select.currentText().split(":")[0])
         if isinstance(value, float):
-            print(value)
+            # print(value)
             request = dronecan.uavcan.protocol.param.GetSet.Request(
                 index=index,
                 value=dronecan.uavcan.protocol.param.Value(real_value=value),
