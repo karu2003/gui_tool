@@ -571,7 +571,7 @@ class Manta50Panel(QDialog):
         # 15
         self.flux_est_freq = QDoubleSpinBox(self)
         self.flux_est_freq.setMinimum(0.0)
-        self.flux_est_freq.setMaximum(150.0)
+        self.flux_est_freq.setMaximum(250.0)
         self.flux_est_freq.setDecimals(3)
         self.flux_est_freq.setValue(60.0)
         self.flux_est_freq_set = QPushButton("Set", self)
@@ -634,9 +634,8 @@ class Manta50Panel(QDialog):
         # 20
         motor_off = QHBoxLayout()
         self.motor_off_label = QLabel("stop the engine")
-        self.motor_off_set = QPushButton("Motor off", self)
+        self.motor_off_set = QPushButton("Motor Stop", self)
         self.motor_off_set.clicked.connect(self.do_motor_off)
-        # self.motor_off_set.clicked.connect(self.do_execute_opcode(MOTOR_OFF_OPCODE))
 
         motor_off.addWidget(self.motor_off_label, stretch=5)
         motor_off.addWidget(self.motor_off_set, stretch=1)
