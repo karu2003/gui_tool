@@ -57,6 +57,11 @@ ERROR = 3
 waiting_time = int(789)  # * 2
 REQUEST_PRIORITY = 30
 
+MOTOR_ID_OPCODE = 111
+ARMING_OPCODE = 112
+MOTOR_OFF_OPCODE = 113
+
+
 
 class CTRL_State(Enum):
     CTRL_State_Error = 0  # the controller error state
@@ -428,7 +433,7 @@ class Manta50Panel(QDialog):
         # self.arming = QLabel("Request for manual control")
         self.arming_set = QPushButton("Set", self)
         self.arming_set.clicked.connect(self.on_arming_set)
-        # self.arming_set.clicked.connect(self.do_execute_opcode(112))
+        # self.arming_set.clicked.connect(self.do_execute_opcode(ARMING_OPCODE))
         layout.addLayout(self.labelWidget("Arming Request", [self.arming, self.arming_set]))
 
         # 3
@@ -579,7 +584,7 @@ class Manta50Panel(QDialog):
         self.progressBar.setRange(0, 11)
         self.startButton = QPushButton("Start Motor ID", self)
         self.startButton.clicked.connect(self.start_motor_id)
-        # self.startButton.clicked.connect(partial(self.do_execute_opcode, 111))
+        # self.startButton.clicked.connect(partial(self.do_execute_opcode, MOTOR_ID_OPCODE))
 
         self.motor_OK_label = QLabel(self)
         self.motor_OK_label.setStyleSheet("background-color: red;")
@@ -625,6 +630,18 @@ class Manta50Panel(QDialog):
         reset.addWidget(self.reset_set, stretch=1)
 
         layout.addLayout(reset)
+
+        # 20
+        motor_off = QHBoxLayout()
+        self.motor_off_label = QLabel("stop the engine")
+        self.motor_off_set = QPushButton("Motor off", self)
+        self.motor_off_set.clicked.connect(self.do_motor_off)
+        # self.motor_off_set.clicked.connect(self.do_execute_opcode(MOTOR_OFF_OPCODE))
+
+        motor_off.addWidget(self.motor_off_label, stretch=5)
+        motor_off.addWidget(self.motor_off_set, stretch=1)
+
+        layout.addLayout(motor_off)
 
         self.setLayout(layout)
         self.resize(1600, 600)
@@ -714,6 +731,10 @@ class Manta50Panel(QDialog):
         self.EstState_display.clear()
         self.UserErrorCode_display.clear()
         self.DrvErrorCode_display.clear()
+    
+    def do_motor_off(self):
+        self.nodeid = int(self.node_select.currentText().split(":")[0])
+        self.do_execute_opcode(MOTOR_OFF_OPCODE)
 
     def update_table(self):
         self.table.clearContents()
@@ -817,6 +838,29 @@ class Manta50Panel(QDialog):
                 raise
         return None
 
+    def get_param_value3(self, param_name, convert_func=int):
+        """
+        Returns three parameter values from the table, if they exist.
+        The parameter value is expected to be a string of three numbers separated by spaces.
+        """
+        column_index = self.param_index.get(param_name, [None])[0]
+        if column_index is not None:
+            item = self.table.item(1, column_index)
+            value = item.text()
+            try:
+                # Split the string into three parts
+                parts = value.split()
+                if len(parts) != 3:
+                    raise ValueError("Expected a string with three numbers separated by spaces.")
+                
+                # Convert each part to an int
+                return tuple(convert_func(part) for part in parts)
+            except ValueError:
+                # Handle cases where conversion is not possible
+                raise ValueError("Failed to convert the values to int.")
+        return None
+
+
     def update_ui_from_params(self):
         """
         Updates all UI elements based on parameter values.
@@ -862,9 +906,12 @@ class Manta50Panel(QDialog):
             self.set_checkboxes_from_byte(control_word)
 
         # Update Midle Point
-        midle_point = self.get_param_value("Midle Point", int)
+        midle_point = self.get_param_value3("Midle Point", int)
         if midle_point is not None:
-            self.midle_point.setChecked(bool(midle_point))
+            self.midle_point.setChecked(bool(midle_point[0]))
+            self.esc_min.setValue(midle_point[1])
+            self.esc_max.setValue(midle_point[2])
+
 
         # Update Acceleration
         acceleration = self.get_param_value("Acceleration", float)
@@ -973,7 +1020,7 @@ class Manta50Panel(QDialog):
         """set arming"""
         com_index = self.param_index["Arming"][0]
         self.current_index = com_index + 1
-        self.do_execute_opcode(112)
+        self.do_execute_opcode(ARMING_OPCODE)
         # arming = 1 if self.arming.isChecked() else 0
         # QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, arming))
 
@@ -1026,7 +1073,7 @@ class Manta50Panel(QDialog):
 
     def on_max_motor_current_set(self):
         """set max_motor_current"""
-        com_index = self.param_index["Max Motor Current"][0]
+        com_index = self.param_index["Motor Max Current"][0]
         self.current_index = com_index + 1
         max_motor_current = self.max_current.value()
         QTimer.singleShot(waiting_time, lambda: self.send_value(com_index, max_motor_current))
@@ -1127,7 +1174,7 @@ class Manta50Panel(QDialog):
         self.set_ui_state(set=True)
         self.nodeid = int(self.node_select.currentText().split(":")[0])
 
-        self.do_execute_opcode(111)
+        self.do_execute_opcode(MOTOR_ID_OPCODE)
 
     def updateProgressBarStyle(self, value):
 
