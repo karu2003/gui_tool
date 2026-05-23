@@ -9,7 +9,7 @@
 import dronecan
 from functools import partial
 
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QLabel,
@@ -30,8 +30,8 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QStatusBar,
 )
-from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QTextOption
+from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QTextOption
 from logging import getLogger
 from ..widgets import make_icon_button, get_icon, get_monospace_font
 from ..widgets import table_display
@@ -1557,4 +1557,4 @@ def spawn(parent, node):
     return _singleton
 
 
-get_icon = partial(get_icon, "asterisk")
+get_icon = partial(get_icon, 'fa6s.asterisk')
